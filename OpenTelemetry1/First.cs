@@ -12,7 +12,20 @@ public class First
 
         var activitySource = new ActivitySource("OpenTelemetry1");
 
-        var activity = activitySource.StartActivity(ActivityKind.Producer);
+        using var activity = activitySource.StartActivity(
+            "First",
+            ActivityKind.Producer,
+            default(string?));
+
+        activity?.SetTag("foo", "bar");
+
+        Baggage.SetBaggage("user", "bob");
+
+        activity?.AddEvent(new ActivityEvent("boom"));
+
+        SomeMethod(activitySource);
+
+        var x = Baggage.Current;
 
         if (activity != null)
         {
@@ -24,5 +37,12 @@ public class First
         }
 
         return messageAttributes;
+    }
+
+    private void SomeMethod(ActivitySource activitySource)
+    {
+        using var activity = activitySource.StartActivity("SomeMethod", ActivityKind.Internal, default(string?));
+
+        activity?.SetTag("aaa", "bbb");
     }
 }

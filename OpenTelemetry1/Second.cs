@@ -17,7 +17,20 @@ public class Second
             messageAttributes,
             (attributes, key) => attributes.TryGetValue(key, out var value) ? new[] { value } : Array.Empty<string>());
 
+        Console.WriteLine($"Second: TraceId={context.ActivityContext.TraceId}");
+        Console.WriteLine($"Second: SpanId={context.ActivityContext.SpanId}");
+        foreach (var entry in context.Baggage)
+        {
+            Console.WriteLine($"Second: Baggage entry {entry.Key}={entry.Value}");
+        }
+
         var activitySource = new ActivitySource("OpenTelemetry1");
+
+
+        var activity1 = activitySource.StartActivity("Second.1", ActivityKind.Consumer, context.ActivityContext);
+        activity1?.SetTag("1", "2");
+        activity1?.Dispose();
+
 
         using var activity = activitySource.StartActivity(
             "Second",
@@ -25,5 +38,7 @@ public class Second
             default(string?),
             new List<KeyValuePair<string, object?>>(),
             new[] { new ActivityLink(context.ActivityContext) });
+
+        activity?.SetTag("x", "y");
     }
 }
