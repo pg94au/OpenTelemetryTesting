@@ -41,7 +41,11 @@ public class First
 
     private void SomeMethod(ActivitySource activitySource)
     {
-        using var activity = activitySource.StartActivity("SomeMethod", ActivityKind.Internal, default(string?));
+        using var activity = activitySource.StartActivity("SomeMethod", ActivityKind.Internal);
+
+        //using var activity = activitySource.StartActivity("Blah", ActivityKind.Internal, Activity.Current?.Context ?? default);
+
+        //using var activity = activitySource.StartActivity("SomeMethod", ActivityKind.Internal, default(string?));
 
         activity?.SetTag("aaa", "bbb");
     }
